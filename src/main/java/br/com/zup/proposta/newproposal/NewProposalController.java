@@ -25,7 +25,7 @@ class NewProposalController {
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid NewProposalRequest request) {
 
-        if(request.existsProposal(allProposals, request.document)){
+        if(allProposals.existsByDocument(request.document)){
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
 

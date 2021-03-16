@@ -19,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class NewProposalControllerTest {
 
+    private final String URL_CREATE_PROPOSAL = "/api/proposals";
+
     @Autowired
     AllProposals allProposals;
 
@@ -31,9 +33,9 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 "email@email.com",
                 "Kyo Kusanagi",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        ResultActions post = requester.post("/api/proposals", request).andExpect(status().isCreated());
+        ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
 
         Proposal proposalSearched = allProposals.findByDocument(request.document).get();
         post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
@@ -47,10 +49,10 @@ class NewProposalControllerTest {
         Proposal proposal = new Proposal("03098082003",
                 "email@email.com",
                 "Kyo Kusanagi",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), new Address("Baker Street", 221,"0000-000" ));
         allProposals.save(proposal);
 
-        requester.get("/api/proposals/{id}", proposal.getId())
+        requester.get(URL_CREATE_PROPOSAL+"/{id}", proposal.getId())
                 .andExpect(status().isOk())
                 .andExpect(content().json(requester.toJson(NewProposalResponse.of(proposal))));
     }
@@ -59,7 +61,7 @@ class NewProposalControllerTest {
     @Test
     @DisplayName("Should not return invalid id proposal, return status 404")
     void get_proposal_by_invalid_id() throws Exception {
-        requester.get("/api/proposals/{id}", Long.MAX_VALUE)
+        requester.get(URL_CREATE_PROPOSAL+"/{id}", Long.MAX_VALUE)
                 .andExpect(status().isNotFound());
     }
 
@@ -71,9 +73,9 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest(null,
                 "email@email.com",
                 "Kyo Kusanagi",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post("/api/proposals", request)
+        requester.post(URL_CREATE_PROPOSAL, request)
                 .andExpect(status().isBadRequest());
     }
 
@@ -84,9 +86,9 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 null,
                 "Kyo Kusanagi",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post("/api/proposals", request)
+        requester.post(URL_CREATE_PROPOSAL, request)
                 .andExpect(status().isBadRequest());
     }
 
@@ -97,9 +99,9 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 "email@email.com",
                 null,
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post("/api/proposals", request)
+        requester.post(URL_CREATE_PROPOSAL, request)
                 .andExpect(status().isBadRequest());
     }
 
@@ -110,9 +112,9 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 "email@email.com",
                 "Kyo Kusanagi",
-                null);
+                null, new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post("/api/proposals", request)
+        requester.post(URL_CREATE_PROPOSAL, request)
                 .andExpect(status().isBadRequest());
     }
 
@@ -123,9 +125,9 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 "email@email.com",
                 "Kyo Kusanagi",
-                BigDecimal.valueOf(-10000));
+                BigDecimal.valueOf(-10000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post("/api/proposals", request)
+        requester.post(URL_CREATE_PROPOSAL, request)
                 .andExpect(status().isBadRequest());
     }
 
@@ -136,10 +138,52 @@ class NewProposalControllerTest {
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 "email@email.com",
                 "Kyo Kusanagi",
-                BigDecimal.valueOf(10000));
+                BigDecimal.valueOf(10000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
         allProposals.save(request.toProposal());
-        requester.post("/api/proposals", request)
+        requester.post(URL_CREATE_PROPOSAL, request)
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+
+    @Test
+    @DisplayName("Should not create new proposal without address street")
+    void add_new_proposal_without_address_street() throws Exception {
+
+        NewProposalRequest request = new NewProposalRequest("03098082003",
+                "email@email.com",
+                "Kyo Kusanagi",
+                BigDecimal.valueOf(10000), new AddressRequest("", 221,"0000-000" ));
+
+        requester.post(URL_CREATE_PROPOSAL, request)
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @DisplayName("Should not create new proposal without address cep")
+    void add_new_proposal_without_address_cep() throws Exception {
+
+        NewProposalRequest request = new NewProposalRequest("03098082003",
+                "email@email.com",
+                "Kyo Kusanagi",
+                BigDecimal.valueOf(10000), new AddressRequest("", 221,"" ));
+
+        requester.post(URL_CREATE_PROPOSAL, request)
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    @DisplayName("Should not create new proposal without address number")
+    void add_new_proposal_without_address_number() throws Exception {
+
+        NewProposalRequest request = new NewProposalRequest("03098082003",
+                "email@email.com",
+                "Kyo Kusanagi",
+                BigDecimal.valueOf(10000), new AddressRequest("Baker Street", null,"0000-000" ));
+
+        requester.post(URL_CREATE_PROPOSAL, request)
+                .andExpect(status().isBadRequest());
     }
 }

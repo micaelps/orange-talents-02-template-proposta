@@ -29,11 +29,15 @@ class Proposal {
     @Column(nullable = false)
     private BigDecimal salary;
 
-    Proposal(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary) {
+    @Embedded
+    private Address adress;
+
+    Proposal(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address adress) {
         this.document = document;
         this.email = email;
         this.name = name;
         this.salary = salary;
+        this.adress = adress;
     }
 
     @Deprecated
@@ -58,5 +62,9 @@ class Proposal {
 
     public BigDecimal getSalary() {
         return salary;
+    }
+
+    public Address getAddress() {
+        return adress;
     }
 }

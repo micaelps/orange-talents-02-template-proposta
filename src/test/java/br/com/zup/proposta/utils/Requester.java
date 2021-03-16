@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-
 @Component
 public class Requester {
 
@@ -21,18 +20,24 @@ public class Requester {
     ObjectMapper objectMapper;
 
     public ResultActions post(String url, Object obj) throws Exception {
-
         return mockMvc.perform(MockMvcRequestBuilders.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(obj)));
+    }
+
+    public ResultActions post(String url, String json) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
+    }
+
+    public ResultActions get(String url, Long id) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.get(url, id));
     }
 
     public String toJson(Object obj) throws JsonProcessingException {
         return objectMapper.writeValueAsString(obj);
     }
 
-    public ResultActions get(String url, Long id) throws Exception {
-        return mockMvc.perform(MockMvcRequestBuilders.get(url, id));
-    }
 
 }

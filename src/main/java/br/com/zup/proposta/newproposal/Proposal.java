@@ -29,6 +29,10 @@ class Proposal {
     @Column(nullable = false)
     private BigDecimal salary;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProposalStatus status = ProposalStatus.PEDING;
+
     @Embedded
     private Address adress;
 
@@ -62,6 +66,10 @@ class Proposal {
 
     public BigDecimal getSalary() {
         return salary;
+    }
+
+    public void updateStatus(ProposalStatus newStatus){
+        this.status = newStatus;
     }
 
     public Address getAddress() {

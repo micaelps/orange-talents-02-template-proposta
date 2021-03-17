@@ -1,11 +1,13 @@
 package br.com.zup.proposta.newproposal;
 
 
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -21,6 +23,9 @@ class NewProposalController {
     @Autowired
     private AllProposals allProposals;
 
+    @Autowired
+    private ClientFinancialVerification financialVerification;
+
     @Transactional
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid NewProposalRequest request) {
@@ -31,9 +36,26 @@ class NewProposalController {
 
         Proposal proposal = request.toProposal();
         allProposals.save(proposal);
+        ProposalStatus statusProcessed = processStatus(proposal);
+        proposal.updateStatus(statusProcessed);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(proposal.getId()).toUri();
         return ResponseEntity.created(uri).build();
     }
+
+    private ProposalStatus processStatus(Proposal proposal) {
+        try {
+            FinancialVerificationRequest request = new FinancialVerificationRequest(proposal.getDocument(),proposal.getName(), proposal.getId().toString());
+            financialVerification.ClientFinancialVerification(request);
+            return  ProposalStatus.ELEGIBLE;
+
+        }catch (FeignException.UnprocessableEntity feignException) {
+            return ProposalStatus.NOT_ELIGIBLE;
+
+        }catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Broken error");
+        }
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long proposalId){

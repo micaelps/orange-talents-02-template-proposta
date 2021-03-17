@@ -1,6 +1,8 @@
-package br.com.zup.proposta.newproposal;
+package br.com.zup.proposta.proposal;
 
 
+import br.com.zup.proposta.proposal.feignClients.CardVerificattion;
+import br.com.zup.proposta.proposal.feignClients.*;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,8 +16,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
 
-import static java.util.Objects.*;
-
 @RestController
 @RequestMapping("/api/proposals")
 class NewProposalController {
@@ -24,7 +24,10 @@ class NewProposalController {
     private AllProposals allProposals;
 
     @Autowired
-    private ClientFinancialVerification financialVerification;
+    private FinancialVerification financialVerification;
+
+    @Autowired
+    private CardVerificattion cardVerificattion;
 
     @Transactional
     @PostMapping
@@ -45,7 +48,7 @@ class NewProposalController {
     private ProposalStatus processStatus(Proposal proposal) {
         try {
             FinancialVerificationRequest request = new FinancialVerificationRequest(proposal.getDocument(),proposal.getName(), proposal.getId().toString());
-            financialVerification.ClientFinancialVerification(request);
+            financialVerification.check(request);
             return  ProposalStatus.ELEGIBLE;
 
         }catch (FeignException.UnprocessableEntity feignException) {

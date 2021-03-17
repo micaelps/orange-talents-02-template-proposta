@@ -1,4 +1,4 @@
-package br.com.zup.proposta.newproposal;
+package br.com.zup.proposta.proposal;
 
 import br.com.zup.proposta.validators.CPForCNPJ;
 import com.fasterxml.jackson.annotation.JsonCreator;

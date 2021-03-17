@@ -1,9 +1,8 @@
-package br.com.zup.proposta.newproposal;
+package br.com.zup.proposta.proposal;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable

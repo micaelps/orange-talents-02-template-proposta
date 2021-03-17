@@ -1,4 +1,4 @@
-package br.com.zup.proposta.newproposal;
+package br.com.zup.proposta.proposal.feignClients;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

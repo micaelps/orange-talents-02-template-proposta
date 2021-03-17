@@ -1,4 +1,4 @@
-package br.com.zup.proposta.newproposal;
+package br.com.zup.proposta.proposal;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -34,14 +34,16 @@ class Proposal {
     private ProposalStatus status = ProposalStatus.PEDING;
 
     @Embedded
-    private Address adress;
+    private Address address;
 
-    Proposal(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address adress) {
+    private String cardId;
+
+    Proposal(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address address) {
         this.document = document;
         this.email = email;
         this.name = name;
         this.salary = salary;
-        this.adress = adress;
+        this.address = address;
     }
 
     @Deprecated
@@ -73,6 +75,24 @@ class Proposal {
     }
 
     public Address getAddress() {
-        return adress;
+        return address;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    @Override
+    public String toString() {
+        return "Proposal{" +
+                "id=" + id +
+                ", document='" + document + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", salary=" + salary +
+                ", status=" + status +
+                ", address=" + address +
+                ", cardId='" + cardId + '\'' +
+                '}';
     }
 }

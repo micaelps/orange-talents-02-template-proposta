@@ -30,13 +30,17 @@ class NewProposalResponse {
     @JsonProperty
     final Address address;
 
+    @JsonProperty
+    final ProposalStatus status;
+
     @JsonCreator
-    public NewProposalResponse(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address address) {
+    public NewProposalResponse(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address address, ProposalStatus status) {
         this.document = document;
         this.email = email;
         this.name = name;
         this.salary = salary;
         this.address = address;
+        this.status = status;
     }
 
     public static NewProposalResponse of(Proposal proposal){
@@ -44,6 +48,7 @@ class NewProposalResponse {
                 proposal.getEmail(),
                 proposal.getName(),
                 proposal.getSalary(),
-                proposal.getAddress());
+                proposal.getAddress(),
+                proposal.getStatus());
     }
 }

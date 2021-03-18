@@ -95,4 +95,8 @@ class Proposal {
                 ", cardId='" + cardId + '\'' +
                 '}';
     }
+
+    public ProposalStatus getStatus() {
+        return this.status;
+    }
 }

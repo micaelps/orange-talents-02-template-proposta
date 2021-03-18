@@ -1,7 +1,7 @@
 package br.com.zup.proposta.proposal;
 
 
-import br.com.zup.proposta.proposal.feignClients.CardVerificattion;
+import br.com.zup.proposta.proposal.feignClients.CardVerification;
 import br.com.zup.proposta.proposal.feignClients.*;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ class NewProposalController {
     private FinancialVerification financialVerification;
 
     @Autowired
-    private CardVerificattion cardVerificattion;
+    private CardVerification cardVerification;
 
     @Transactional
     @PostMapping

@@ -18,12 +18,12 @@ class Address {
     private String cep;
 
     @JsonCreator
-    public Address(String street, int number, String cep) {
+    Address(String street, int number, String cep) {
         this.street = street;
         this.number = number;
         this.cep = cep;
     }
 
-    public Address() {
+    Address() {
     }
 }

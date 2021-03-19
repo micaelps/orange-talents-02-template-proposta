@@ -53,11 +53,9 @@ class NewProposalController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> get(@PathVariable("id") Long proposalId){
-        Optional<Proposal> proposal = allProposals.findById(proposalId);
-        if(proposal.isPresent()) {
-            return ResponseEntity.ok(NewProposalResponse.of(proposal.get()));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> get(@PathVariable("id") Long proposalId) {
+        return allProposals.findById(proposalId)
+                .map((x) -> ResponseEntity.ok(NewProposalResponse.of(x)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

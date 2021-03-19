@@ -1,10 +1,13 @@
 package br.com.zup.proposta.card;
 
+import br.com.zup.proposta.biometry.Biometry;
 import br.com.zup.proposta.proposal.Proposal;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Card {
@@ -23,6 +26,9 @@ public class Card {
 
     @OneToOne
     private Proposal proposal;
+
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "card")
+    private Set<Biometry> biometries = new HashSet<Biometry>();
 
 
     public Card(String external_card_id, String holder, LocalDateTime issuedOn, BigDecimal limit, Proposal proposal) {
@@ -47,5 +53,10 @@ public class Card {
                 ", limit_card=" + limit_card +
                 ", proposal=" + proposal +
                 '}';
+    }
+
+    public Card addBiometry(Biometry biometry) {
+        this.biometries.add(biometry);
+        return this;
     }
 }

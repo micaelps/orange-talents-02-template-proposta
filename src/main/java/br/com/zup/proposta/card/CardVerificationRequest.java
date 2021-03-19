@@ -1,4 +1,4 @@
-package br.com.zup.proposta.proposal.feignClients;
+package br.com.zup.proposta.card;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

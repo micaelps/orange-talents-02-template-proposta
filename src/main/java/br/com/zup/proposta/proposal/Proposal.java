@@ -1,4 +1,6 @@
 package br.com.zup.proposta.proposal;
+import br.com.zup.proposta.card.Card;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -6,7 +8,7 @@ import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 @Entity
-class Proposal {
+public class Proposal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,9 +38,11 @@ class Proposal {
     @Embedded
     private Address address;
 
-    private String cardId;
+    @OneToOne(cascade = CascadeType.MERGE)
+    private Card card;
 
-    Proposal(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address address) {
+
+    public Proposal(@NotBlank String document, @NotBlank String email, @NotBlank String name, @NotNull @Positive BigDecimal salary, Address address) {
         this.document = document;
         this.email = email;
         this.name = name;
@@ -78,10 +82,6 @@ class Proposal {
         return address;
     }
 
-    public void setCardId(String cardId) {
-        this.cardId = cardId;
-    }
-
     @Override
     public String toString() {
         return "Proposal{" +
@@ -92,11 +92,15 @@ class Proposal {
                 ", salary=" + salary +
                 ", status=" + status +
                 ", address=" + address +
-                ", cardId='" + cardId + '\'' +
+                ", cardId='" + card + '\'' +
                 '}';
     }
 
     public ProposalStatus getStatus() {
         return this.status;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
     }
 }

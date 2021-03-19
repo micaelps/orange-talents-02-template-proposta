@@ -6,10 +6,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Optional;
 
-interface AllProposals extends CrudRepository<Proposal, Long> {
+public interface AllProposals extends CrudRepository<Proposal, Long> {
     Optional<Proposal> findByDocument(String document);
 
     boolean existsByDocument(@NotBlank String document);
 
-    List<Proposal> findTop10ByStatusAndCardIdIsNull(ProposalStatus elegible);
+    List<Proposal> findTop10ByStatusAndCardIsNull(ProposalStatus elegible);
 }

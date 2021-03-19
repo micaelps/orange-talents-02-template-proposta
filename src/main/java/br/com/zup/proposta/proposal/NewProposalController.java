@@ -1,8 +1,6 @@
 package br.com.zup.proposta.proposal;
 
 
-import br.com.zup.proposta.proposal.feignClients.CardVerification;
-import br.com.zup.proposta.proposal.feignClients.*;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,23 +18,20 @@ import java.util.Optional;
 @RequestMapping("/api/proposals")
 class NewProposalController {
 
-    @Autowired
-    private AllProposals allProposals;
+    final AllProposals allProposals;
+    final FinancialVerification financialVerification;
 
-    @Autowired
-    private FinancialVerification financialVerification;
-
-    @Autowired
-    private CardVerification cardVerification;
+    NewProposalController(AllProposals allProposals, FinancialVerification financialVerification) {
+        this.allProposals = allProposals;
+        this.financialVerification = financialVerification;
+    }
 
     @Transactional
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid NewProposalRequest request) {
-
         if(allProposals.existsByDocument(request.document)){
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
-
         Proposal proposal = request.toProposal();
         allProposals.save(proposal);
         ProposalStatus statusProcessed = processStatus(proposal);
@@ -50,24 +45,19 @@ class NewProposalController {
             FinancialVerificationRequest request = new FinancialVerificationRequest(proposal.getDocument(),proposal.getName(), proposal.getId().toString());
             financialVerification.check(request);
             return  ProposalStatus.ELEGIBLE;
-
         }catch (FeignException.UnprocessableEntity feignException) {
             return ProposalStatus.NOT_ELIGIBLE;
-
         }catch(Exception e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Broken error");
         }
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long proposalId){
         Optional<Proposal> proposal = allProposals.findById(proposalId);
-
         if(proposal.isPresent()) {
             return ResponseEntity.ok(NewProposalResponse.of(proposal.get()));
         }
-
         return ResponseEntity.notFound().build();
     }
 }

@@ -1,4 +1,4 @@
-package br.com.zup.proposta.proposal.feignClients;
+package br.com.zup.proposta.proposal;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestBody;

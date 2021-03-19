@@ -1,8 +1,8 @@
-package br.com.zup.proposta.proposal;
+package br.com.zup.proposta.card;
 
-import br.com.zup.proposta.proposal.feignClients.CardVerificationRequest;
-import br.com.zup.proposta.proposal.feignClients.CardVerificationResponse;
-import br.com.zup.proposta.proposal.feignClients.CardVerification;
+import br.com.zup.proposta.proposal.AllProposals;
+import br.com.zup.proposta.proposal.Proposal;
+import br.com.zup.proposta.proposal.ProposalStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,15 +13,18 @@ import java.util.List;
 @Component
 class CheckAndUpdateIdCard {
 
-    @Autowired
-    AllProposals allProposals;
+    final AllProposals allProposals;
 
-    @Autowired
-    CardVerification cardVerification;
+    final CardVerification cardVerification;
 
-    @Scheduled(fixedDelay=5000, initialDelayString = "15000")
+    public CheckAndUpdateIdCard(AllProposals allProposals, CardVerification cardVerification) {
+        this.allProposals = allProposals;
+        this.cardVerification = cardVerification;
+    }
+
+    @Scheduled(fixedDelay=5000)
     public void check() {
-        List<Proposal> proposalsCardIdNull = allProposals.findTop10ByStatusAndCardIdIsNull(ProposalStatus.ELEGIBLE);
+        List<Proposal> proposalsCardIdNull = allProposals.findTop10ByStatusAndCardIsNull(ProposalStatus.ELEGIBLE);
         proposalsCardIdNull.forEach(this::updateCardId);
     }
 
@@ -29,7 +32,9 @@ class CheckAndUpdateIdCard {
     private void updateCardId(Proposal proposal) {
         CardVerificationRequest request = new CardVerificationRequest(proposal.getDocument(), proposal.getName(), proposal.getId().toString());
         CardVerificationResponse response = cardVerification.verify(request);
-        proposal.setCardId(response.getId());
+        proposal.setCard(response.toCard(proposal));
         allProposals.save(proposal);
+
+
     }
 }

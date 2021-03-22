@@ -1,17 +1,21 @@
 package br.com.zup.proposta.proposal;
 
 import br.com.zup.proposta.utils.Requester;
+import feign.FeignException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -24,20 +28,46 @@ class NewProposalControllerTest {
     @Autowired
     AllProposals allProposals;
 
+    @MockBean
+    FinancialVerification financialVerification;
+
     @Autowired
     Requester requester;
 
     @Test
-    @DisplayName("Should create new proposal, return status 200 and location based persisted proposal")
-    void add_new_proposal() throws Exception {
+    @DisplayName("Should create new proposal, return status 200, location based persisted proposal, eligible proposal")
+    void add_new_eligible_proposal() throws Exception {
+
         NewProposalRequest request = new NewProposalRequest("03098082003",
                 "email@email.com",
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
+        BDDMockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenReturn(new FinancialVerificationResponse(request.document, request.name, null, null));
         ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
-
         Proposal proposalSearched = allProposals.findByDocument(request.document).get();
+
+
+        Assertions.assertEquals(ProposalStatus.ELEGIBLE,proposalSearched.getStatus());
+        post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
+        Assertions.assertEquals(request.document, proposalSearched.getDocument());
+    }
+
+    @Test
+    @DisplayName("Should create new proposal, return status 200, location based persisted proposal, not eligible proposal")
+    void add_new_not_eligible_proposal() throws Exception {
+
+        NewProposalRequest request = new NewProposalRequest("03098082003",
+                "email@email.com",
+                "Kyo Kusanagi",
+                BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
+
+        BDDMockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenThrow(FeignException.UnprocessableEntity.class);
+        ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
+        Proposal proposalSearched = allProposals.findByDocument(request.document).get();
+
+
+        Assertions.assertEquals(ProposalStatus.NOT_ELIGIBLE,proposalSearched.getStatus());
         post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
         Assertions.assertEquals(request.document, proposalSearched.getDocument());
     }

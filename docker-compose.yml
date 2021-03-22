@@ -145,14 +145,15 @@ services:
     volumes:
       - mysql-volume:/var/lib/mysql
 
-  proposta:
-    image: orangetalents/proposta
-    ports:
-    - 8080:8080
-    depends_on:
-      - mysql
-      - contas
-      - analise
+#  proposta:
+#    image: orangetalents/proposta
+#    ports:
+#    - 8080:8080
+#    depends_on:
+#      - mysql
+#      - contas
+#      - analise
+
 volumes:
   grafana-volume:
   prometheus-volume:

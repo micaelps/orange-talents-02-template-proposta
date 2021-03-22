@@ -40,22 +40,25 @@ class NewProposalController {
         return ResponseEntity.created(uri).build();
     }
 
-    private ProposalStatus processStatus(Proposal proposal) {
-        try {
-            FinancialVerificationRequest request = new FinancialVerificationRequest(proposal.getDocument(),proposal.getName(), proposal.getId().toString());
-            financialVerification.check(request);
-            return  ProposalStatus.ELEGIBLE;
-        }catch (FeignException.UnprocessableEntity feignException) {
-            return ProposalStatus.NOT_ELIGIBLE;
-        }catch(Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Broken error");
-        }
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long proposalId) {
         return allProposals.findById(proposalId)
                 .map((x) -> ResponseEntity.ok(NewProposalResponse.of(x)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    private ProposalStatus processStatus(Proposal proposal) {
+        try {
+            FinancialVerificationRequest request = new FinancialVerificationRequest(proposal.getDocument(),proposal.getName(), proposal.getId().toString());
+            financialVerification.check(request);
+            return  ProposalStatus.ELEGIBLE;
+
+        }catch (FeignException.UnprocessableEntity feignException) {
+            return ProposalStatus.NOT_ELIGIBLE;
+
+        }catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Server Broken error");
+        }
+    }
+
 }

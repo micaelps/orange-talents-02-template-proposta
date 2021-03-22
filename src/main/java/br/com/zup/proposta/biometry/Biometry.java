@@ -42,4 +42,8 @@ public class Biometry {
     public int hashCode() {
         return Objects.hash(card, base64);
     }
+
+    public Long getId() {
+        return id;
+    }
 }

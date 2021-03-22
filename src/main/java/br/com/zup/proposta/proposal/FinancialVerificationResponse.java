@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FinancialVerificationResponse {
 
-    @JsonProperty("document")
+    @JsonProperty("documento")
     private String document;
 
     @JsonProperty("nome")
@@ -24,4 +24,13 @@ public class FinancialVerificationResponse {
         this.resultStatus = resultStatus;
     }
 
+    @Override
+    public String toString() {
+        return "FinancialVerificationResponse{" +
+                "document='" + document + '\'' +
+                ", name='" + name + '\'' +
+                ", idProposal='" + idProposal + '\'' +
+                ", resultStatus='" + resultStatus + '\'' +
+                '}';
+    }
 }

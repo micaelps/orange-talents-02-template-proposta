@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,7 +44,7 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        BDDMockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenReturn(new FinancialVerificationResponse(request.document, request.name, null, null));
+        Mockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenReturn(new FinancialVerificationResponse(request.document, request.name, null, null));
         ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
         Proposal proposalSearched = allProposals.findByDocument(request.document).get();
 
@@ -62,7 +63,7 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        BDDMockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenThrow(FeignException.UnprocessableEntity.class);
+        Mockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenThrow(FeignException.UnprocessableEntity.class);
         ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
         Proposal proposalSearched = allProposals.findByDocument(request.document).get();
 

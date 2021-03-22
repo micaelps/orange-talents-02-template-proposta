@@ -34,17 +34,6 @@ public class CardVerificationResponse {
         this.idProposal = idProposal;
     }
 
-    @Override
-    public String toString() {
-        return "CardVerificationResponse{" +
-                "external_card_id='" + external_card_id + '\'' +
-                ", holder='" + holder + '\'' +
-                ", issuedOn=" + issuedOn +
-                ", limit=" + limit +
-                ", idProposal='" + idProposal + '\'' +
-                '}';
-    }
-
     Card toCard(Proposal proposal){
         return  new Card(external_card_id, holder, issuedOn, limit, proposal);
     }

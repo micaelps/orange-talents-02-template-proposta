@@ -1,6 +1,7 @@
 package br.com.zup.proposta.biometry;
 
 import br.com.zup.proposta.card.Card;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -45,5 +46,17 @@ public class Biometry {
 
     public Long getId() {
         return id;
+    }
+
+    public String getBase64() {
+        return base64;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

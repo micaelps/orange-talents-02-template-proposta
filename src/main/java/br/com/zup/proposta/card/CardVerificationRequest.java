@@ -4,12 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CardVerificationRequest {
-//        {
-//            "documento": "393.896.040-01",
-//                "nome": "Bob",
-//                "idProposta": "husaidkjhadagasd"
-//        }
-
 
     @JsonProperty("documento")
     private String document;

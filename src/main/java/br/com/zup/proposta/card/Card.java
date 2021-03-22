@@ -1,13 +1,20 @@
 package br.com.zup.proposta.card;
 
 import br.com.zup.proposta.biometry.Biometry;
+import br.com.zup.proposta.biometry.NewBiometryResponse;
 import br.com.zup.proposta.proposal.Proposal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Entity
 public class Card {
@@ -27,7 +34,7 @@ public class Card {
     @OneToOne
     private Proposal proposal;
 
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "card")
+    @OneToMany(cascade = CascadeType.MERGE,fetch = FetchType.LAZY,mappedBy = "card")
     private Set<Biometry> biometrics = new HashSet<Biometry>();
 
 
@@ -43,18 +50,32 @@ public class Card {
     public Card() {
     }
 
-    @Override
-    public String toString() {
-        return "Card{" +
-                "id=" + id +
-                ", external_card_id='" + external_card_id + '\'' +
-                ", holder='" + holder + '\'' +
-                ", issuedOn=" + issuedOn +
-                ", limit_card=" + limit_card +
-                ", proposal=" + proposal +
-                '}';
-    }
     public Long getId() {
         return id;
     }
+
+    public String getExternal_card_id() {
+        return external_card_id;
+    }
+
+    public String getHolder() {
+        return holder;
+    }
+
+    public LocalDateTime getIssuedOn() {
+        return issuedOn;
+    }
+
+    public BigDecimal getLimit_card() {
+        return limit_card;
+    }
+
+    public Proposal getProposal() {
+        return proposal;
+    }
+
+    public Set<Biometry> getBiometrics() {
+        return biometrics;
+    }
 }
+

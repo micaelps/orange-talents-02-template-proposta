@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.Embeddable;
 
 @Embeddable
+public
 class Address {
 
     @JsonProperty
@@ -18,7 +19,7 @@ class Address {
     private String cep;
 
     @JsonCreator
-    Address(String street, int number, String cep) {
+    public Address(String street, int number, String cep) {
         this.street = street;
         this.number = number;
         this.cep = cep;

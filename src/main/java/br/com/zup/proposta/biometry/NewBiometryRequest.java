@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.EntityManager;
+import javax.validation.constraints.NotBlank;
 
-class NewBiometryRequest {
+public class NewBiometryRequest {
 
+    @NotBlank
     @JsonProperty
-   private String biometry;
+    private final String biometry;
 
     @JsonCreator
     public NewBiometryRequest(String biometry) {
@@ -18,5 +20,9 @@ class NewBiometryRequest {
 
     public Biometry toModel(Card card) {
         return new Biometry(card, biometry);
+    }
+
+    public String getBiometry() {
+        return biometry;
     }
 }

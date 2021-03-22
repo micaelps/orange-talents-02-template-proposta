@@ -82,20 +82,6 @@ public class Proposal {
         return address;
     }
 
-    @Override
-    public String toString() {
-        return "Proposal{" +
-                "id=" + id +
-                ", document='" + document + '\'' +
-                ", email='" + email + '\'' +
-                ", name='" + name + '\'' +
-                ", salary=" + salary +
-                ", status=" + status +
-                ", address=" + address +
-                ", cardId='" + card + '\'' +
-                '}';
-    }
-
     public ProposalStatus getStatus() {
         return this.status;
     }

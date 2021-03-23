@@ -27,7 +27,8 @@ public class NewBiometryController {
     @Transactional
     @PostMapping("api/biometrics/{id}")
     public ResponseEntity<?> save(@RequestBody @Valid NewBiometryRequest request, @PathVariable("id") Long cardId, UriComponentsBuilder uriBuilder) {
-
+        Card aa = manager.find(Card.class, cardId);
+        System.out.println(">>>>>>>>>>>>>>>>>>>>> "+ aa);
         return Optional.ofNullable(manager.find(Card.class, cardId))
                 .map(request::toModel)
                 .map(allBiometrics::save)
@@ -38,7 +39,7 @@ public class NewBiometryController {
     @GetMapping("api/biometrics/{biometryId}")
     public ResponseEntity<NewBiometryResponse> getById(@PathVariable Long biometryId){
         return  allBiometrics.findById(biometryId)
-                .map(biometry-> ResponseEntity.ok(NewBiometryResponse.of(biometry, CardResponse.of(biometry.getCard()))))
+                .map(biometry-> ResponseEntity.ok(NewBiometryResponse.of(biometry)))
                 .orElseGet(()->ResponseEntity.notFound().build());
     }
 

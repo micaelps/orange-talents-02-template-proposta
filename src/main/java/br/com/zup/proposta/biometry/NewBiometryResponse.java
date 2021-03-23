@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class NewBiometryResponse {
 
     @JsonProperty
-    @JsonBackReference
     final CardResponse card;
     @JsonProperty
     final LocalDateTime createdAt;
@@ -26,8 +25,8 @@ public class NewBiometryResponse {
         this.base64 = base64;
     }
 
-    public static NewBiometryResponse of(Biometry biometry, CardResponse card){
-        return new NewBiometryResponse(card, biometry.getCreatedAt(), biometry.getBase64());
+    public static NewBiometryResponse of(Biometry biometry){
+        return new NewBiometryResponse(CardResponse.of(biometry.getCard()), biometry.getCreatedAt(), biometry.getBase64());
     }
 
     @Override

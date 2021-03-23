@@ -37,6 +37,7 @@ class NewProposalControllerTest {
     Requester requester;
 
     @Test
+    @WithMockUser
     @DisplayName("Should create new proposal, return status 200, location based persisted proposal, eligible proposal")
     void add_new_eligible_proposal() throws Exception {
 
@@ -56,6 +57,7 @@ class NewProposalControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should create new proposal, return status 200, location based persisted proposal, not eligible proposal")
     void add_new_not_eligible_proposal() throws Exception {
 
@@ -76,6 +78,7 @@ class NewProposalControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should return by id created proposal, return status 200 and response based object proposal")
     void get_proposal_by_id() throws Exception {
         Proposal proposal = new Proposal("03098082003",
@@ -91,6 +94,7 @@ class NewProposalControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should not return invalid id proposal, return status 404")
     void get_proposal_by_invalid_id() throws Exception {
         requester.get(URL_CREATE_PROPOSAL+"/{id}", Long.MAX_VALUE)
@@ -99,6 +103,7 @@ class NewProposalControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without document")
     void add_new_proposal_without_document() throws Exception {
 
@@ -112,6 +117,7 @@ class NewProposalControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without email")
     void add_new_proposal_without_email() throws Exception {
 
@@ -125,6 +131,7 @@ class NewProposalControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without name")
     void add_new_proposal_without_name() throws Exception {
 
@@ -138,6 +145,7 @@ class NewProposalControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without salary")
     void add_new_proposal_without_salary() throws Exception {
 
@@ -151,6 +159,7 @@ class NewProposalControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal with negative salary")
     void add_new_proposal_with_negative_salary() throws Exception {
 
@@ -164,6 +173,7 @@ class NewProposalControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new duplicated proposal")
     void add_new_proposal_duplicate() throws Exception {
 
@@ -179,6 +189,7 @@ class NewProposalControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without address street")
     void add_new_proposal_without_address_street() throws Exception {
 
@@ -193,6 +204,7 @@ class NewProposalControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without address cep")
     void add_new_proposal_without_address_cep() throws Exception {
 
@@ -207,6 +219,7 @@ class NewProposalControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new proposal without address number")
     void add_new_proposal_without_address_number() throws Exception {
 

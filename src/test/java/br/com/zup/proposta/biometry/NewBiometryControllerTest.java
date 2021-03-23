@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.persistence.EntityManager;
@@ -51,6 +52,7 @@ class NewBiometryControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should create new biometry and return 201")
     void add_new_biometry() throws Exception {
 
@@ -75,6 +77,7 @@ class NewBiometryControllerTest {
 
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new invalid biometry")
     void add_new_invalid_biometry() throws Exception {
         NewBiometryRequest request = new NewBiometryRequest(null);
@@ -85,6 +88,7 @@ class NewBiometryControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Should not create new biometry with invalid card")
     void add_new_biometry_invalid_card() throws Exception {
 
@@ -97,8 +101,9 @@ class NewBiometryControllerTest {
     }
 
 
-    @DisplayName("Should response correct object")
     @Test
+    @WithMockUser
+    @DisplayName("Should response correct object")
     void get_biometry() throws Exception {
         NewBiometryRequest request = new NewBiometryRequest(BIOMETRY_BASE64);
         Biometry savedBiometry = allBiometrics.save(request.toModel(card));

@@ -1,17 +1,17 @@
 package br.com.zup.proposta.biometry;
 
 import br.com.zup.proposta.card.Card;
-import br.com.zup.proposta.card.CardResponse;
-import br.com.zup.proposta.proposal.*;
+import br.com.zup.proposta.proposal.Address;
+import br.com.zup.proposta.proposal.Proposal;
 import br.com.zup.proposta.utils.Requester;
-import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -20,7 +20,6 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -97,7 +96,6 @@ class NewBiometryControllerTest {
         Iterable<Biometry> all = allBiometrics.findAll();
         List<Biometry> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(collect.size(), 0);
-        Assertions.assertEquals(1,1);
     }
 
 

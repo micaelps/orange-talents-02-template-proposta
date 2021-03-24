@@ -3,7 +3,6 @@ package br.com.zup.proposta.card;
 import br.com.zup.proposta.proposal.AllProposals;
 import br.com.zup.proposta.proposal.Proposal;
 import br.com.zup.proposta.proposal.ProposalStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,12 +13,11 @@ import java.util.List;
 class CheckAndUpdateIdCard {
 
     final AllProposals allProposals;
+    final CardVerificationClient cardVerificationClient;
 
-    final CardVerification cardVerification;
-
-    public CheckAndUpdateIdCard(AllProposals allProposals, CardVerification cardVerification) {
+    public CheckAndUpdateIdCard(AllProposals allProposals, CardVerificationClient cardVerificationClient) {
         this.allProposals = allProposals;
-        this.cardVerification = cardVerification;
+        this.cardVerificationClient = cardVerificationClient;
     }
 
     @Scheduled(fixedDelay=5000)
@@ -31,7 +29,7 @@ class CheckAndUpdateIdCard {
     @Transactional
     private void updateCardId(Proposal proposal) {
         CardVerificationRequest request = new CardVerificationRequest(proposal.getDocument(), proposal.getName(), proposal.getId().toString());
-        CardVerificationResponse response = cardVerification.verify(request);
+        CardVerificationResponse response = cardVerificationClient.register(request);
         proposal.setCard(response.toCard(proposal));
         allProposals.save(proposal);
 

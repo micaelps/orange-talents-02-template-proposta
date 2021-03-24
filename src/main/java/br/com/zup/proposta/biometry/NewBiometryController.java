@@ -1,16 +1,12 @@
 package br.com.zup.proposta.biometry;
 
 import br.com.zup.proposta.card.Card;
-import br.com.zup.proposta.card.CardResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
@@ -18,11 +14,13 @@ import java.util.Optional;
 @RestController
 public class NewBiometryController {
 
-    @Autowired
-    private AllBiometrics allBiometrics;
+    final AllBiometrics allBiometrics;
+    final EntityManager manager;
 
-    @PersistenceContext
-    EntityManager manager;
+    public NewBiometryController(AllBiometrics allBiometrics, EntityManager manager) {
+        this.allBiometrics = allBiometrics;
+        this.manager = manager;
+    }
 
     @Transactional
     @PostMapping("api/biometrics/{id}")

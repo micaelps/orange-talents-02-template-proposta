@@ -1,7 +1,6 @@
 package br.com.zup.proposta.card;
 
 import br.com.zup.proposta.proposal.NewProposalResponse;
-import br.com.zup.proposta.proposal.Proposal;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -31,10 +30,10 @@ public class CardResponse {
     }
 
     public static CardResponse of(Card card){
-        return new CardResponse(card.getExternal_card_id(),
+        return new CardResponse(card.getExternalCardId(),
                 card.getHolder(),
                 card.getIssuedOn(),
-                card.getLimit_card(),
+                card.getLimitCard(),
                NewProposalResponse.of(card.getProposal()));
     }
 

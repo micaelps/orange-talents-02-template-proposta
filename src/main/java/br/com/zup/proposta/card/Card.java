@@ -27,6 +27,9 @@ public class Card {
     @OneToOne
     private Proposal proposal;
 
+    @Column(nullable = false)
+    private Boolean block = false;
+
     @OneToMany(cascade = CascadeType.MERGE,fetch = FetchType.LAZY,mappedBy = "card")
     private Set<Biometry> biometrics = new HashSet<Biometry>();
 
@@ -69,6 +72,15 @@ public class Card {
 
     public Set<Biometry> getBiometrics() {
         return biometrics;
+    }
+
+    public Card block() {
+        this.block = true;
+        return this;
+    }
+
+    public Boolean isBlocked() {
+        return block;
     }
 }
 

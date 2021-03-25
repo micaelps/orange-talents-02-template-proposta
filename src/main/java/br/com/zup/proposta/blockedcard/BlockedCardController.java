@@ -16,7 +16,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class BlockedCardController {
+class BlockedCardController {
 
     final CardVerificationClient cardVerificationClient;
     final EntityManager entityManager;
@@ -35,21 +35,25 @@ public class BlockedCardController {
         String clientHostResolver = new ClientHostResolver(request).resolve();
 
         return allCards.findByExternalCardId(idCard)
-                .map(card -> checkBlocked(card))
+                .map(card -> block(card))
                 .map(card -> new BlockedCard(idCard, clientHostResolver, userAgent))
                 .map(allBlockedCards::save)
-                .map(blockedCard -> ResponseEntity.ok().build())
+                .map(card -> allCards.findByExternalCardId(card.getExternaId()))
+                .map(card -> ResponseEntity.ok().build())
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    private Card checkBlocked(Card card) {
+    private Card block(Card card) {
         try {
             cardVerificationClient.lock(card.getExternalCardId());
+            card.block();
             return card;
+
         } catch (FeignException.UnprocessableEntity feue) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }

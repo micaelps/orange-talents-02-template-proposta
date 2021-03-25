@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -46,6 +45,9 @@ class BlockedCardControllerTest {
     MockMvc mockMvc;
 
     @MockBean
+    AllCards allCardsMock;
+
+    @Autowired
     AllCards allCards;
 
     @MockBean
@@ -65,7 +67,7 @@ class BlockedCardControllerTest {
     @DisplayName("Should create blocked card and return 200")
     void create_blocked_card() throws Exception {
 
-        Mockito.when(allCards.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
+        Mockito.when(allCardsMock.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
 
         Map<String, String> response = new HashMap<>();
         Mockito.when(cardVerificationClient.lock("1")).thenReturn(response);
@@ -74,8 +76,10 @@ class BlockedCardControllerTest {
                 .post("/api/lock/cards/"+card.getExternalCardId())
                 .header("User-Agent","teste"))
                 .andExpect(status().isOk());
+
         Optional<BlockedCard> blockedCard = allBlockedCards.findById(1L);
 
+        Assertions.assertEquals(true, card.isBlocked());
         Assertions.assertEquals(blockedCard.get().getExternaId(), card.getExternalCardId());
     }
 
@@ -88,7 +92,7 @@ class BlockedCardControllerTest {
         Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/lock/cards/"+card.getExternalCardId())
+                .post("/api/lock/cards/"+Long.MAX_VALUE)
                 .header("User-Agent","teste"))
                 .andExpect(status().isNotFound());
 
@@ -97,6 +101,9 @@ class BlockedCardControllerTest {
         Iterable<BlockedCard> all = allBlockedCards.findAll();
         List<BlockedCard> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(0, collect.size());
+        Assertions.assertEquals(false, card.isBlocked());
+
+
     }
 
     @Test
@@ -104,7 +111,7 @@ class BlockedCardControllerTest {
     @DisplayName("Should not block a blocked card and return 422")
     void block_card_blocked() throws Exception {
 
-        Mockito.when(allCards.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
+        Mockito.when(allCardsMock.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
         Map<String, String> response = new HashMap<>();
         Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenThrow(FeignException.UnprocessableEntity.class);
         mockMvc.perform(MockMvcRequestBuilders
@@ -117,5 +124,34 @@ class BlockedCardControllerTest {
         Iterable<BlockedCard> all = allBlockedCards.findAll();
         List<BlockedCard> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(0, collect.size());
+
+        Card persistedCard = allCards.findByExternalCardId(card.getExternalCardId()).get();
+        Assertions.assertEquals(persistedCard.isBlocked(), false);
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("Should not block when receiving 500 external API")
+    void block_card_server_error() throws Exception {
+
+
+        Mockito.when(allCardsMock.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
+        Map<String, String> response = new HashMap<>();
+        Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenThrow(FeignException.InternalServerError.class);
+        mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/lock/cards/"+card.getExternalCardId())
+                .header("User-Agent","teste"))
+                .andExpect(status().isInternalServerError());
+
+        Optional<BlockedCard> blockedCard = allBlockedCards.findById(1L);
+
+        Iterable<BlockedCard> all = allBlockedCards.findAll();
+        List<BlockedCard> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
+        Assertions.assertEquals(0, collect.size());
+
+        Card persistedCard = allCards.findByExternalCardId(card.getExternalCardId()).get();
+        Assertions.assertEquals(persistedCard.isBlocked(), false);
+
     }
 }

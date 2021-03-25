@@ -3,7 +3,8 @@ package br.com.zup.proposta.biometry;
 import br.com.zup.proposta.card.Card;
 import br.com.zup.proposta.proposal.Address;
 import br.com.zup.proposta.proposal.Proposal;
-import br.com.zup.proposta.utils.Requester;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +13,12 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,10 +44,16 @@ class NewBiometryControllerTest {
     AllBiometrics allBiometrics;
 
     @Autowired
-    Requester requester;
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @MockBean
+    EntityManager mockManager;
 
     @PersistenceContext
-    EntityManager manager;
+    EntityManager entityManager;
 
     @BeforeEach
     void setup(){
@@ -54,15 +65,16 @@ class NewBiometryControllerTest {
     @WithMockUser
     @DisplayName("Should create new biometry and return 201")
     void add_new_biometry() throws Exception {
-
-        manager.persist(proposal);
-        manager.persist(card);
-
         NewBiometryRequest request = new NewBiometryRequest(BIOMETRY_BASE64);
 
-        manager = Mockito.mock(EntityManager.class);
-        Mockito.when(manager.find(Card.class, 1L)).thenReturn(card);
-        ResultActions post = requester.post("/api/biometrics/1", request).andExpect(status().isCreated());
+        entityManager.persist(proposal);
+        entityManager.persist(card);
+        Mockito.when(mockManager.find(Card.class, 1L)).thenReturn(card);
+
+        ResultActions post = mockMvc.perform(MockMvcRequestBuilders.post("/api/biometrics/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
+                .andExpect(status().isCreated());
 
         Iterable<Biometry> all = allBiometrics.findAll();
         List<Biometry> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
@@ -80,7 +92,12 @@ class NewBiometryControllerTest {
     @DisplayName("Should not create new invalid biometry")
     void add_new_invalid_biometry() throws Exception {
         NewBiometryRequest request = new NewBiometryRequest(null);
-        requester.post("/api/biometrics/1", request).andExpect(status().isBadRequest());
+
+        ResultActions post = mockMvc.perform(MockMvcRequestBuilders.post("/api/biometrics/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
+                .andExpect(status().isBadRequest());
+
         Iterable<Biometry> all = allBiometrics.findAll();
         List<Biometry> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(collect.size(), 0);
@@ -90,14 +107,17 @@ class NewBiometryControllerTest {
     @WithMockUser
     @DisplayName("Should not create new biometry with invalid card")
     void add_new_biometry_invalid_card() throws Exception {
-
         NewBiometryRequest request = new NewBiometryRequest(BIOMETRY_BASE64);
-        requester.post("/api/biometrics/"+Long.MAX_VALUE, request).andExpect(status().isNotFound());
+
+        ResultActions post = mockMvc.perform(MockMvcRequestBuilders.post("/api/biometrics/"+Long.MAX_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
+                .andExpect(status().isNotFound());
+
         Iterable<Biometry> all = allBiometrics.findAll();
         List<Biometry> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(collect.size(), 0);
     }
-
 
     @Test
     @WithMockUser
@@ -106,8 +126,13 @@ class NewBiometryControllerTest {
         NewBiometryRequest request = new NewBiometryRequest(BIOMETRY_BASE64);
         Biometry savedBiometry = allBiometrics.save(request.toModel(card));
         NewBiometryResponse response = NewBiometryResponse.of(savedBiometry);
-        requester.get("/api/biometrics/{id}", savedBiometry.getId())
-                 .andExpect(status().isOk())
-                 .andExpect(content().json(requester.toJson(response)));
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/biometrics/{id}", savedBiometry.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(response)));
     }
+
+    public String toJson(Object obj) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(obj);
+    }
+
 }

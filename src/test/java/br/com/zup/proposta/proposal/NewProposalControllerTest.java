@@ -1,18 +1,21 @@
 package br.com.zup.proposta.proposal;
 
-import br.com.zup.proposta.utils.Requester;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -28,13 +31,16 @@ class NewProposalControllerTest {
     private final String URL_CREATE_PROPOSAL = "/api/proposals";
 
     @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     AllProposals allProposals;
 
     @MockBean
     FinancialVerification financialVerification;
-
-    @Autowired
-    Requester requester;
 
     @Test
     @WithMockUser
@@ -47,9 +53,11 @@ class NewProposalControllerTest {
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
         Mockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenReturn(new FinancialVerificationResponse(request.document, request.name, null, null));
-        ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
+        ResultActions post = mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
+                .andExpect(status().isCreated());
         Proposal proposalSearched = allProposals.findByDocument(request.document).get();
-
 
         Assertions.assertEquals(ProposalStatus.ELEGIBLE,proposalSearched.getStatus());
         post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
@@ -67,9 +75,13 @@ class NewProposalControllerTest {
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
         Mockito.when(financialVerification.check(any(FinancialVerificationRequest.class))).thenThrow(FeignException.UnprocessableEntity.class);
-        ResultActions post = requester.post(URL_CREATE_PROPOSAL, request).andExpect(status().isCreated());
-        Proposal proposalSearched = allProposals.findByDocument(request.document).get();
 
+        ResultActions post = mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
+                .andExpect(status().isCreated());
+
+        Proposal proposalSearched = allProposals.findByDocument(request.document).get();
 
         Assertions.assertEquals(ProposalStatus.NOT_ELIGIBLE,proposalSearched.getStatus());
         post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
@@ -87,9 +99,9 @@ class NewProposalControllerTest {
                 BigDecimal.valueOf(1000), new Address("Baker Street", 221,"0000-000" ));
         allProposals.save(proposal);
 
-        requester.get(URL_CREATE_PROPOSAL+"/{id}", proposal.getId())
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_CREATE_PROPOSAL+"/{id}", proposal.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().json(requester.toJson(NewProposalResponse.of(proposal))));
+                .andExpect(content().json(toJson(NewProposalResponse.of(proposal))));
     }
 
 
@@ -97,7 +109,7 @@ class NewProposalControllerTest {
     @WithMockUser
     @DisplayName("Should not return invalid id proposal, return status 404")
     void get_proposal_by_invalid_id() throws Exception {
-        requester.get(URL_CREATE_PROPOSAL+"/{id}", Long.MAX_VALUE)
+        mockMvc.perform(MockMvcRequestBuilders.get(URL_CREATE_PROPOSAL+"/{id}", Long.MAX_VALUE))
                 .andExpect(status().isNotFound());
     }
 
@@ -112,7 +124,9 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+       mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -126,7 +140,9 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -140,7 +156,9 @@ class NewProposalControllerTest {
                 null,
                 BigDecimal.valueOf(1000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -154,7 +172,9 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 null, new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -168,7 +188,9 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(-10000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -183,7 +205,9 @@ class NewProposalControllerTest {
                 BigDecimal.valueOf(10000), new AddressRequest("Baker Street", 221,"0000-000" ));
 
         allProposals.save(request.toProposal());
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isUnprocessableEntity());
     }
 
@@ -198,7 +222,9 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(10000), new AddressRequest("", 221,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -213,7 +239,9 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(10000), new AddressRequest("", 221,"" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -228,7 +256,14 @@ class NewProposalControllerTest {
                 "Kyo Kusanagi",
                 BigDecimal.valueOf(10000), new AddressRequest("Baker Street", null,"0000-000" ));
 
-        requester.post(URL_CREATE_PROPOSAL, request)
+        mockMvc.perform(MockMvcRequestBuilders.post(URL_CREATE_PROPOSAL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
                 .andExpect(status().isBadRequest());
     }
+
+    public String toJson(Object obj) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(obj);
+    }
+
 }

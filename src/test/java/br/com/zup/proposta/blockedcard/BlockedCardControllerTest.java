@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.transaction.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -96,8 +94,6 @@ class BlockedCardControllerTest {
                 .header("User-Agent","teste"))
                 .andExpect(status().isNotFound());
 
-        Optional<BlockedCard> blockedCard = allBlockedCards.findById(1L);
-
         Iterable<BlockedCard> all = allBlockedCards.findAll();
         List<BlockedCard> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
         Assertions.assertEquals(0, collect.size());
@@ -112,14 +108,11 @@ class BlockedCardControllerTest {
     void block_card_blocked() throws Exception {
 
         Mockito.when(allCardsMock.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
-        Map<String, String> response = new HashMap<>();
         Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenThrow(FeignException.UnprocessableEntity.class);
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/lock/cards/"+card.getExternalCardId())
                 .header("User-Agent","teste"))
                 .andExpect(status().isUnprocessableEntity());
-
-        Optional<BlockedCard> blockedCard = allBlockedCards.findById(1L);
 
         Iterable<BlockedCard> all = allBlockedCards.findAll();
         List<BlockedCard> collect = StreamSupport.stream(all.spliterator(), false).collect(Collectors.toList());
@@ -135,9 +128,7 @@ class BlockedCardControllerTest {
     @DisplayName("Should not block when receiving 500 external API")
     void block_card_server_error() throws Exception {
 
-
         Mockito.when(allCardsMock.findByExternalCardId(card.getExternalCardId())).thenReturn(Optional.of(card));
-        Map<String, String> response = new HashMap<>();
         Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenThrow(FeignException.InternalServerError.class);
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/lock/cards/"+card.getExternalCardId())

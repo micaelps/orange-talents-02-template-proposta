@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Optional;
 
 @RestController
-public class NewBiometryController {
+class NewBiometryController {
 
     final AllBiometrics allBiometrics;
     final EntityManager manager;

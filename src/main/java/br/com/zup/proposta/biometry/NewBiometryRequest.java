@@ -7,22 +7,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.EntityManager;
 import javax.validation.constraints.NotBlank;
 
-public class NewBiometryRequest {
+class NewBiometryRequest {
 
     @NotBlank
     @JsonProperty
-    private final String biometry;
+    final String biometry;
 
     @JsonCreator
-    public NewBiometryRequest(String biometry) {
+    NewBiometryRequest(String biometry) {
         this.biometry = biometry;
     }
 
-    public Biometry toModel(Card card) {
+    Biometry toModel(Card card) {
         return new Biometry(card, biometry);
     }
 
-    public String getBiometry() {
+    String getBiometry() {
         return biometry;
     }
 }

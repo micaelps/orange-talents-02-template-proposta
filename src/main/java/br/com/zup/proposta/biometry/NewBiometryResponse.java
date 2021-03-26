@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class NewBiometryResponse {
+class NewBiometryResponse {
 
     @JsonProperty
     final CardResponse card;
@@ -25,7 +25,7 @@ public class NewBiometryResponse {
         this.base64 = base64;
     }
 
-    public static NewBiometryResponse of(Biometry biometry){
+    static NewBiometryResponse of(Biometry biometry){
         return new NewBiometryResponse(CardResponse.of(biometry.getCard()), biometry.getCreatedAt(), biometry.getBase64());
     }
 

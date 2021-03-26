@@ -2,19 +2,19 @@ package br.com.zup.proposta.proposal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class FinancialVerificationResponse {
+class FinancialVerificationResponse {
 
     @JsonProperty("documento")
-    private String document;
+    final String document;
 
     @JsonProperty("nome")
-    private String name;
+    final String name;
 
     @JsonProperty("idProposta")
-    private String idProposal;
+    final String idProposal;
 
     @JsonProperty("resultadoSolicitacao")
-    private String resultStatus;
+    final String resultStatus;
 
 
     public FinancialVerificationResponse(String document, String name, String idProposal, String resultStatus) {

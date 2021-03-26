@@ -33,7 +33,7 @@ public class Proposal {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ProposalStatus status = ProposalStatus.PEDING;
+    private ProposalStatus status = ProposalStatus.PENDING;
 
     @Embedded
     private Address address;

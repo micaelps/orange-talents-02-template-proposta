@@ -32,14 +32,13 @@ class BlockedCardController {
     }
 
     @PostMapping("/api/lock/cards/{idCard}")
-    public ResponseEntity<?> LockCard(HttpServletRequest request, @PathVariable String idCard, @RequestHeader(value = "User-Agent") String userAgent) {
+    public ResponseEntity<?> LockCard(HttpServletRequest request, @PathVariable Long idCard, @RequestHeader(value = "User-Agent") String userAgent) {
         String clientHostResolver = new ClientHostResolver(request).resolve();
 
-        return allCards.findByExternalCardId(idCard)
+        return allCards.findById(idCard)
                 .map(card -> block(card))
-                .map(card -> new BlockedCard(idCard, clientHostResolver, userAgent))
+                .map(card -> new BlockedCard(card.getExternalCardId(), clientHostResolver, userAgent))
                 .map(allBlockedCards::save)
-                .map(card -> allCards.findByExternalCardId(card.getExternaId()))
                 .map(card -> ResponseEntity.ok().build())
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -52,7 +51,6 @@ class BlockedCardController {
 
         } catch (FeignException.UnprocessableEntity feue) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
-
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }

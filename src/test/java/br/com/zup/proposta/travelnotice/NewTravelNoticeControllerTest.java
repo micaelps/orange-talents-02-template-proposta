@@ -67,11 +67,12 @@ class NewTravelNoticeControllerTest {
     @DisplayName("Should create new travel notice and return 200")
     void create_new_travel_notice() throws Exception{
         Mockito.when(allCards.findById(1L)).thenReturn(Optional.of(card));
-        NewTravelNoticeRequest request = new NewTravelNoticeRequest(addressRequest, LocalDate.now(), "0.0.0.0.0","teste" );
+        NewTravelNoticeRequest request = new NewTravelNoticeRequest(addressRequest, LocalDate.now());
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_TRAVEL_NOTICE_CARD_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)))
+                .content(toJson(request))
+                .header("User-Agent","teste"))
                 .andExpect(status().isOk());
 
         Assertions.assertEquals(1L,allTravelNotices.count());
@@ -83,11 +84,12 @@ class NewTravelNoticeControllerTest {
     @DisplayName("Should not create travel notice without valid card")
     void create_new_travel_notice_without_card() throws Exception{
         Mockito.when(allCards.findById(2L)).thenReturn(Optional.of(card));
-        NewTravelNoticeRequest request = new NewTravelNoticeRequest(addressRequest, LocalDate.now(), "0.0.0.0.0","teste" );
+        NewTravelNoticeRequest request = new NewTravelNoticeRequest(addressRequest, LocalDate.now());
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_TRAVEL_NOTICE_CARD_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)))
+                .content(toJson(request))
+                .header("User-Agent","teste"))
                 .andExpect(status().isNotFound());
 
         Assertions.assertEquals(0L,allTravelNotices.count());
@@ -97,7 +99,7 @@ class NewTravelNoticeControllerTest {
     @WithMockUser
     @DisplayName("Should not create travel notice without valid card")
     void create_new_travel_notice_without_address() throws Exception{
-        NewTravelNoticeRequest request = new NewTravelNoticeRequest(addressRequest, LocalDate.now(), "0.0.0.0.0","teste" );
+        NewTravelNoticeRequest request = new NewTravelNoticeRequest(addressRequest, LocalDate.now());
         Mockito.when(allCards.findById(1L)).thenReturn(Optional.of(card));
         mockMvc.perform(MockMvcRequestBuilders.post(URL_TRAVEL_NOTICE_CARD_ID_1)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +115,7 @@ class NewTravelNoticeControllerTest {
     @NullAndEmptySource
     void create_new_travel_notice_without_address_street(String invalidStreet) throws Exception{
         AddressRequest addressWithoutStreet = new AddressRequest(invalidStreet,4, "00000");
-        NewTravelNoticeRequest travelNoticeAddressTestRequest = new NewTravelNoticeRequest(addressWithoutStreet, LocalDate.now(), "0.0.0.0.0","teste" );
+        NewTravelNoticeRequest travelNoticeAddressTestRequest = new NewTravelNoticeRequest(addressWithoutStreet, LocalDate.now());
         Mockito.when(allCards.findById(1L)).thenReturn(Optional.of(card));
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_TRAVEL_NOTICE_CARD_ID_1)
@@ -130,7 +132,7 @@ class NewTravelNoticeControllerTest {
     @NullAndEmptySource
     void create_new_travel_notice_without_address_cep(String invalidCep) throws Exception{
         AddressRequest addressWithoutStreet = new AddressRequest("rua tal",4, invalidCep);
-        NewTravelNoticeRequest travelNoticeAddressTestRequest = new NewTravelNoticeRequest(addressWithoutStreet, LocalDate.now(), "0.0.0.0.0","teste" );
+        NewTravelNoticeRequest travelNoticeAddressTestRequest = new NewTravelNoticeRequest(addressWithoutStreet, LocalDate.now());
         Mockito.when(allCards.findById(1L)).thenReturn(Optional.of(card));
 
         mockMvc.perform(MockMvcRequestBuilders.post(URL_TRAVEL_NOTICE_CARD_ID_1)

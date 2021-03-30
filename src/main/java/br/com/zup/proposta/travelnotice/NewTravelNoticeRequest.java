@@ -17,7 +17,6 @@ class NewTravelNoticeRequest {
     @JsonProperty
     @Embedded
     @Valid
-    @NotNull
     final AddressRequest destination;
 
     @JsonProperty
@@ -25,21 +24,14 @@ class NewTravelNoticeRequest {
     @JsonFormat(pattern = "dd/MM/yyyy", shape = JsonFormat.Shape.STRING)
     final LocalDate endOfTravel;
 
-    @JsonProperty
-    final String clientIp;
-
-    @JsonProperty
-    final String userAgent;
 
     @JsonCreator
-    NewTravelNoticeRequest(AddressRequest destination, LocalDate endOfTravel, String clientIp, String userAgent) {
+    NewTravelNoticeRequest(AddressRequest destination, LocalDate endOfTravel) {
         this.destination = destination;
         this.endOfTravel = endOfTravel;
-        this.clientIp = clientIp;
-        this.userAgent = userAgent;
     }
 
-    TravelNotice toTravelNotice() {
+    TravelNotice toTravelNotice(String clientIp, String userAgent) {
         return new TravelNotice(destination.toAdress(), endOfTravel, clientIp, userAgent);
     }
 
@@ -48,8 +40,6 @@ class NewTravelNoticeRequest {
         return "NewTravelNoticeRequest{" +
                 "destination=" + destination +
                 ", endOfTravel=" + endOfTravel +
-                ", clientIp='" + clientIp + '\'' +
-                ", userAgent='" + userAgent + '\'' +
                 '}';
     }
 
@@ -59,13 +49,5 @@ class NewTravelNoticeRequest {
 
     public LocalDate getEndOfTravel() {
         return endOfTravel;
-    }
-
-    public String getClientIp() {
-        return clientIp;
-    }
-
-    public String getUserAgent() {
-        return userAgent;
     }
 }

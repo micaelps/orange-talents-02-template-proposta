@@ -25,8 +25,6 @@ class NewBiometryController {
     @Transactional
     @PostMapping("api/biometrics/{id}")
     public ResponseEntity<?> save(@RequestBody @Valid NewBiometryRequest request, @PathVariable("id") Long cardId, UriComponentsBuilder uriBuilder) {
-        Card aa = manager.find(Card.class, cardId);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>> "+ aa);
         return Optional.ofNullable(manager.find(Card.class, cardId))
                 .map(request::toModel)
                 .map(allBiometrics::save)

@@ -10,20 +10,20 @@ public class BlockedCard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String externaId;
+    private String externalId;
 
     private String clientIp;
 
     private String userAgent;
 
 
-    public BlockedCard(String externaId, String clientIp, String userAgent) {
-        this.externaId = externaId;
+    public BlockedCard(String externalId, String clientIp, String userAgent) {
+        this.externalId = externalId;
         this.clientIp = clientIp;
         this.userAgent = userAgent;
     }
 
-    public String getExternaId() {
-        return externaId;
+    public String getExternalId() {
+        return externalId;
     }
 }

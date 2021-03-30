@@ -1,4 +1,4 @@
-package br.com.zup.proposta.proposal;
+package br.com.zup.proposta.common;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

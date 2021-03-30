@@ -3,6 +3,7 @@ package br.com.zup.proposta.blockedcard;
 import br.com.zup.proposta.card.AllCards;
 import br.com.zup.proposta.card.Card;
 import br.com.zup.proposta.card.CardVerificationClient;
+import br.com.zup.proposta.common.ClientHostResolver;
 import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

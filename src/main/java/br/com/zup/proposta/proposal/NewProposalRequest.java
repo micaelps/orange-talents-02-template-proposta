@@ -1,5 +1,6 @@
 package br.com.zup.proposta.proposal;
 
+import br.com.zup.proposta.common.AddressRequest;
 import br.com.zup.proposta.validators.CPForCNPJ;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

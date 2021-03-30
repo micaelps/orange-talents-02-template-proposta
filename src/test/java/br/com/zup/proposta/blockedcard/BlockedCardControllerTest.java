@@ -3,7 +3,7 @@ package br.com.zup.proposta.blockedcard;
 import br.com.zup.proposta.card.AllCards;
 import br.com.zup.proposta.card.Card;
 import br.com.zup.proposta.card.CardVerificationClient;
-import br.com.zup.proposta.proposal.Address;
+import br.com.zup.proposta.common.Address;
 import br.com.zup.proposta.proposal.Proposal;
 import feign.FeignException;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,7 @@ class BlockedCardControllerTest {
 
     @BeforeEach
     void setup(){
-        proposal = new Proposal("70810536455", "email@email.com.br", "name", BigDecimal.valueOf(1000),new Address("rua", 222, "45080"));
+        proposal = new Proposal("85439567062", "email@email.com.br", "name", BigDecimal.valueOf(1000),new Address("rua", 222, "45080"));
         card = new Card("123321", "holder", LocalDateTime.now(), BigDecimal.valueOf(10000), proposal);
     }
 

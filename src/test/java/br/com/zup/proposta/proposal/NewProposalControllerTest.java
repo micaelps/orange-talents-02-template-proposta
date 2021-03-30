@@ -1,5 +1,7 @@
 package br.com.zup.proposta.proposal;
 
+import br.com.zup.proposta.common.Address;
+import br.com.zup.proposta.common.AddressRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;

@@ -1,5 +1,6 @@
 package br.com.zup.proposta.proposal;
 import br.com.zup.proposta.card.Card;
+import br.com.zup.proposta.common.Address;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package br.com.zup.proposta.blockedcard;
+package br.com.zup.proposta.common;
 
 import javax.servlet.http.HttpServletRequest;
 

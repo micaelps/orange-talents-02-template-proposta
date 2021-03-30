@@ -1,12 +1,13 @@
-package br.com.zup.proposta.proposal;
+package br.com.zup.proposta.common;
 
+import br.com.zup.proposta.common.Address;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-class AddressRequest {
+public class AddressRequest {
 
     @JsonProperty
     @NotBlank
@@ -27,7 +28,7 @@ class AddressRequest {
         this.cep = cep;
     }
 
-    Address toAdress(){
+    public Address toAdress(){
         return new Address(this.street, this.number, this.cep);
     }
 

@@ -2,7 +2,7 @@ package br.com.zup.proposta.blockedcard;
 
 import br.com.zup.proposta.card.AllCards;
 import br.com.zup.proposta.card.Card;
-import br.com.zup.proposta.card.CardVerificationClient;
+import br.com.zup.proposta.common.CardVerificationClient;
 import br.com.zup.proposta.common.ClientHostResolver;
 import feign.FeignException;
 import org.springframework.http.HttpStatus;
@@ -36,10 +36,10 @@ class BlockedCardController {
         String clientHostResolver = new ClientHostResolver(request).resolve();
 
         return allCards.findById(idCard)
-                .map(card -> block(card))
-                .map(card -> new BlockedCard(card.getExternalCardId(), clientHostResolver, userAgent))
+                .map(c-> block(c))
+                .map(c-> new BlockedCard(c.getExternalCardId(), clientHostResolver, userAgent))
                 .map(allBlockedCards::save)
-                .map(card -> ResponseEntity.ok().build())
+                .map(x -> ResponseEntity.ok().build())
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

@@ -1,5 +1,6 @@
 package br.com.zup.proposta.card;
 
+import br.com.zup.proposta.common.CardVerificationClient;
 import br.com.zup.proposta.proposal.AllProposals;
 import br.com.zup.proposta.proposal.Proposal;
 import br.com.zup.proposta.proposal.ProposalStatus;

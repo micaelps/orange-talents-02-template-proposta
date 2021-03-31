@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Embeddable;
+import java.util.StringJoiner;
 
 @Embeddable
 public
@@ -26,5 +27,14 @@ class Address {
     }
 
     Address() {
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Address.class.getSimpleName() + "[", "]")
+                .add("street='" + street + "'")
+                .add("number=" + number)
+                .add("cep='" + cep + "'")
+                .toString();
     }
 }

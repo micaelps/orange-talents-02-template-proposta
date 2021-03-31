@@ -1,5 +1,6 @@
 package br.com.zup.proposta.travelnotice;
 
+import br.com.zup.proposta.card.Card;
 import br.com.zup.proposta.common.AddressRequest;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -7,9 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.Embedded;
 import javax.validation.Valid;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 class NewTravelNoticeRequest {
@@ -21,7 +20,7 @@ class NewTravelNoticeRequest {
 
     @JsonProperty
     @FutureOrPresent
-    @JsonFormat(pattern = "dd/MM/yyyy", shape = JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     final LocalDate endOfTravel;
 
 
@@ -31,8 +30,8 @@ class NewTravelNoticeRequest {
         this.endOfTravel = endOfTravel;
     }
 
-    TravelNotice toTravelNotice(String clientIp, String userAgent) {
-        return new TravelNotice(destination.toAdress(), endOfTravel, clientIp, userAgent);
+    TravelNotice toTravelNotice(String clientIp, String userAgent, Card card) {
+        return new TravelNotice(destination.toAdress(), endOfTravel, clientIp, userAgent, card);
     }
 
     @Override

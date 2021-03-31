@@ -2,7 +2,7 @@ package br.com.zup.proposta.blockedcard;
 
 import br.com.zup.proposta.card.AllCards;
 import br.com.zup.proposta.card.Card;
-import br.com.zup.proposta.card.CardVerificationClient;
+import br.com.zup.proposta.common.CardVerificationClient;
 import br.com.zup.proposta.common.Address;
 import br.com.zup.proposta.proposal.Proposal;
 import feign.FeignException;

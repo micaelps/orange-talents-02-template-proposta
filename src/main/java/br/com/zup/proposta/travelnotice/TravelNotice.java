@@ -1,11 +1,9 @@
 package br.com.zup.proposta.travelnotice;
 
+import br.com.zup.proposta.card.Card;
 import br.com.zup.proposta.common.Address;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -16,7 +14,7 @@ public class TravelNotice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Address to;
+    private Address address;
 
     private LocalDate endOfTravel;
 
@@ -26,11 +24,27 @@ public class TravelNotice {
 
     private String userAgent;
 
+    @ManyToOne
+    private Card card;
 
-    public TravelNotice(Address to, LocalDate endOfTravel, String clientIp, String userAgent) {
-        this.to = to;
+
+    public TravelNotice(Address address, LocalDate endOfTravel, String clientIp, String userAgent, Card card) {
+        this.address = address;
         this.endOfTravel = endOfTravel;
         this.clientIp = clientIp;
         this.userAgent = userAgent;
+        this.card = card;
+    }
+
+    public Card getCard() {
+        return this.card;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public LocalDate getEndOfTravel() {
+        return endOfTravel;
     }
 }

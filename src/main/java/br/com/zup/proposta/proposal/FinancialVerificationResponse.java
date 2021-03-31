@@ -2,7 +2,7 @@ package br.com.zup.proposta.proposal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-class FinancialVerificationResponse {
+public class FinancialVerificationResponse {
 
     @JsonProperty("documento")
     final String document;

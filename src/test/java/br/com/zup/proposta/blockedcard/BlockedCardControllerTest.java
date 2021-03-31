@@ -5,6 +5,8 @@ import br.com.zup.proposta.card.Card;
 import br.com.zup.proposta.common.CardVerificationClient;
 import br.com.zup.proposta.common.Address;
 import br.com.zup.proposta.proposal.Proposal;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,6 +32,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -38,6 +43,7 @@ class BlockedCardControllerTest {
 
     Proposal proposal;
     Card card;
+    NewBlockedCardRequest request;
 
     @Autowired
     MockMvc mockMvc;
@@ -54,8 +60,12 @@ class BlockedCardControllerTest {
     @Autowired
     AllBlockedCards allBlockedCards;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @BeforeEach
     void setup(){
+        request = new NewBlockedCardRequest("teste");
         proposal = new Proposal("85439567062", "email@email.com.br", "name", BigDecimal.valueOf(1000),new Address("rua", 222, "45080"));
         card = new Card("123321", "holder", LocalDateTime.now(), BigDecimal.valueOf(10000), proposal);
     }
@@ -68,10 +78,12 @@ class BlockedCardControllerTest {
         Mockito.when(allCardsMock.findById((1L))).thenReturn(Optional.of(card));
 
         Map<String, String> response = new HashMap<>();
-        Mockito.when(cardVerificationClient.lock("1")).thenReturn(response);
+        Mockito.when(cardVerificationClient.lock(anyString(), any(NewBlockedCardRequest.class))).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/lock/cards/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request))
                 .header("User-Agent","teste"))
                 .andExpect(status().isOk());
 
@@ -85,10 +97,12 @@ class BlockedCardControllerTest {
     void create_blocked_card_invalid_id() throws Exception {
 
         Map<String, String> response = new HashMap<>();
-        Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenReturn(response);
+        Mockito.when(cardVerificationClient.lock(card.getExternalCardId(), request)).thenReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/lock/cards/"+Long.MAX_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request))
                 .header("User-Agent","teste"))
                 .andExpect(status().isNotFound());
 
@@ -106,9 +120,12 @@ class BlockedCardControllerTest {
     void block_card_blocked() throws Exception {
 
         Mockito.when(allCardsMock.findById(1L)).thenReturn(Optional.of(card));
-        Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenThrow(FeignException.UnprocessableEntity.class);
+
+        Mockito.when(cardVerificationClient.lock(anyString(),any(NewBlockedCardRequest.class))).thenThrow(FeignException.UnprocessableEntity.class);
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/lock/cards/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request))
                 .header("User-Agent","teste"))
                 .andExpect(status().isUnprocessableEntity());
 
@@ -123,13 +140,20 @@ class BlockedCardControllerTest {
     void block_card_server_error() throws Exception {
 
         Mockito.when(allCardsMock.findById(1L)).thenReturn(Optional.of(card));
-        Mockito.when(cardVerificationClient.lock(card.getExternalCardId())).thenThrow(FeignException.InternalServerError.class);
+        Mockito.when(cardVerificationClient.lock(anyString(),any(NewBlockedCardRequest.class))).thenThrow(FeignException.InternalServerError.class);
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/api/lock/cards/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request))
                 .header("User-Agent","teste"))
                 .andExpect(status().isInternalServerError());
 
         Assertions.assertEquals(0, allBlockedCards.count());
 
+    }
+
+
+    public String toJson(Object obj) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(obj);
     }
 }

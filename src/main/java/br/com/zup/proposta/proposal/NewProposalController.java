@@ -2,7 +2,8 @@ package br.com.zup.proposta.proposal;
 
 
 import feign.FeignException;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,23 +13,28 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/proposals")
-class NewProposalController {
+public class NewProposalController {
 
     final AllProposals allProposals;
     final FinancialVerification financialVerification;
+    final Tracer tracer;
 
-    NewProposalController(AllProposals allProposals, FinancialVerification financialVerification) {
+
+    public NewProposalController(AllProposals allProposals, FinancialVerification financialVerification, Tracer tracer) {
         this.allProposals = allProposals;
         this.financialVerification = financialVerification;
+        this.tracer = tracer;
     }
 
     @Transactional
     @PostMapping
     public ResponseEntity<?> save(@RequestBody @Valid NewProposalRequest request) {
+        Span span = tracer.activeSpan();
+        span.setBaggageItem("proposalRequest.email", request.email);
+
         if(allProposals.existsByDocument(request.document)){
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }

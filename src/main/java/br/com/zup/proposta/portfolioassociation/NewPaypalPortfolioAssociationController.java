@@ -16,39 +16,15 @@ import javax.validation.Valid;
 import java.util.Map;
 
 @RestController
-class NewPaypalPortfolioAssociationController {
+class NewPaypalPortfolioAssociationController extends TemplatePortfolioAssociation {
 
-    final AllPortfolioAssociations allPortfolioAssociations;
-    final AllCards allCards;
-    final CardVerificationClient client;
-
-    NewPaypalPortfolioAssociationController(AllPortfolioAssociations allPortfolioAssociations, AllCards allCards, CardVerificationClient client) {
-        this.allPortfolioAssociations = allPortfolioAssociations;
-        this.allCards = allCards;
-        this.client = client;
-    }
-
-    @PostMapping("api/portfolio/association/{cardId}")
+    @PostMapping("api/portfolio/association/paypal/{cardId}")
     public ResponseEntity<?> create(@PathVariable Long cardId, @RequestBody @Valid NewPortfolioAssociationRequest request) {
-        return allCards.findById(cardId)
-                .map(c -> associate(c, request))
-                .map(allPortfolioAssociations::save)
-                .map(pa -> ResponseEntity.ok().build())
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return super.processNewAssociation(cardId, request);
     }
 
-
-    private PortfolioAssociation associate(Card card, NewPortfolioAssociationRequest request) {
-        try {
-            client.associate(card.getExternalCardId(), request.toClientRequest(Portfolio.PAYPAL));
-            return request.toPortfolioAssociation(card, Portfolio.PAYPAL);
-
-        } catch (FeignException.UnprocessableEntity feue) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
-
-        } catch (Exception e) {
-            System.out.println(e.getStackTrace());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @Override
+    Portfolio getPortfolio() {
+        return Portfolio.PAYPAL;
     }
 }

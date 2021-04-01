@@ -111,6 +111,9 @@ services:
     image: prom/prometheus
     volumes:
       - prometheus-volume:/etc/prometheus/
+      - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      --config.file=/etc/prometheus/prometheus.yml
     network_mode: bridge
     ports:
       - "9090:9090"
@@ -145,14 +148,14 @@ services:
     volumes:
       - mysql-volume:/var/lib/mysql
 
-#  proposta:
-#    image: orangetalents/proposta
-#    ports:
-#    - 8080:8080
-#    depends_on:
-#      - mysql
-#      - contas
-#      - analise
+  proposta:
+    image: orangetalents/proposta
+    ports:
+    - 8080:8080
+    depends_on:
+      - mysql
+      - contas
+      - analise
 
 volumes:
   grafana-volume:

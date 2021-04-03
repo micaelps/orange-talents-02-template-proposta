@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AllProposals extends CrudRepository<Proposal, Long> {
-    Optional<Proposal> findByDocument(String document);
 
-    boolean existsByDocument(@NotBlank String document);
+    Optional<Proposal> findByDocumentHash(String document);
 
     List<Proposal> findTop10ByStatusAndCardIsNull(ProposalStatus elegible);
+
+    boolean existsByDocumentHash(String document);
 }

@@ -1,10 +1,13 @@
 package br.com.zup.proposta.card;
 
 import br.com.zup.proposta.biometry.Biometry;
+import br.com.zup.proposta.common.EncryptDecrypt;
 import br.com.zup.proposta.proposal.Proposal;
+import org.springframework.security.core.token.Sha512DigestUtils;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -81,6 +84,19 @@ public class Card {
 
     public Boolean isBlocked() {
         return block;
+    }
+
+
+    @PrePersist
+    @PreUpdate
+    private void encryptFields() {
+        this.externalCardId = EncryptDecrypt.encrypt(this.externalCardId);
+
+    }
+
+    @PostLoad
+    private void decryptFields() {
+        externalCardId = EncryptDecrypt.decrypt(this.externalCardId);
     }
 }
 

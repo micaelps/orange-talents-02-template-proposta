@@ -1,11 +1,13 @@
 package br.com.zup.proposta.proposal;
 
 
+import br.com.zup.proposta.common.EncryptDecrypt;
 import feign.FeignException;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.token.Sha512DigestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -13,6 +15,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/proposals")
@@ -35,9 +39,12 @@ public class NewProposalController {
         Span span = tracer.activeSpan();
         span.setBaggageItem("proposalRequest.email", request.email);
 
-        if(allProposals.existsByDocument(request.document)){
+        String documentHash = Sha512DigestUtils.shaHex(request.document.getBytes(StandardCharsets.UTF_8));
+        Optional<Proposal> byDocumentHash = allProposals.findByDocumentHash(documentHash);
+        if(allProposals.existsByDocumentHash(documentHash)){
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
         }
+
         Proposal proposal = request.toProposal();
         allProposals.save(proposal);
         ProposalStatus statusProcessed = processStatus(proposal);
@@ -55,7 +62,8 @@ public class NewProposalController {
 
     private ProposalStatus processStatus(Proposal proposal) {
         try {
-            FinancialVerificationRequest request = new FinancialVerificationRequest(proposal.getDocument(),proposal.getName(), proposal.getId().toString());
+            String decrypt = EncryptDecrypt.decrypt(proposal.getDocument());
+            FinancialVerificationRequest request = new FinancialVerificationRequest(decrypt,proposal.getName(), proposal.getId().toString());
             financialVerification.check(request);
             return  ProposalStatus.ELEGIBLE;
 

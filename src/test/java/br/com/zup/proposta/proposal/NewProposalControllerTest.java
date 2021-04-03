@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.token.Sha512DigestUtils;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -59,11 +61,12 @@ class NewProposalControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(request)))
                 .andExpect(status().isCreated());
-        Proposal proposalSearched = allProposals.findByDocument(request.document).get();
+
+        String documentHash = Sha512DigestUtils.shaHex(request.document.getBytes(StandardCharsets.UTF_8));
+        Proposal proposalSearched = allProposals.findByDocumentHash(documentHash).get();
 
         Assertions.assertEquals(ProposalStatus.ELEGIBLE,proposalSearched.getStatus());
         post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
-        Assertions.assertEquals(request.document, proposalSearched.getDocument());
     }
 
     @Test
@@ -83,11 +86,11 @@ class NewProposalControllerTest {
                 .content(toJson(request)))
                 .andExpect(status().isCreated());
 
-        Proposal proposalSearched = allProposals.findByDocument(request.document).get();
+        String documentHash = Sha512DigestUtils.shaHex(request.document.getBytes(StandardCharsets.UTF_8));
+        Proposal proposalSearched = allProposals.findByDocumentHash(documentHash).get();
 
         Assertions.assertEquals(ProposalStatus.NOT_ELIGIBLE,proposalSearched.getStatus());
         post.andExpect(redirectedUrlPattern("http://*/api/proposals/" + proposalSearched.getId()));
-        Assertions.assertEquals(request.document, proposalSearched.getDocument());
     }
 
 
